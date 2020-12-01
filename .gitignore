@@ -1,0 +1,5 @@
+VanillaPG/snek-128h1-PG-first-take
+.vscode
+VanillaPG/__pycache__
+gym_snake.egg-info/PKG-INFO
+gym_snake.egg-info/SOURCES.txt
