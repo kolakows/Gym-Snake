@@ -6,12 +6,12 @@ import torchvision.transforms as T
 import numpy as np
 import gym
 import gym_snake
+import os
 from argparse import Namespace
 
 from pg_network import *
 from VanillaPG.pg_policy import *
-from VanillaPG.policy_sm import *
-from VanillaPG.policy_rewards import *
+from VanillaPG.policy_variants import *
 from utilities import *
 
 # choose policy to train
@@ -75,7 +75,10 @@ for episode in range(episodes):
         render = False
     # store model
     if episode % checkpoint_every == checkpoint_every-1:
-        policy.save('./VanillaPG/checkpoints/checkpoint'+str(episode+1)+'steps' + str(total_steps) + '.pkl')
+        model_path = './VanillaPG/checkpoints/'
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
+        policy.save(model_path + 'checkpoint'+ str(episode+1)+'steps' + str(total_steps) + '.pkl')
         
 env.close()
 
