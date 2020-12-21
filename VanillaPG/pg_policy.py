@@ -9,7 +9,6 @@ import numpy as np
 import gym
 import gym_snake
 
-from pg_network import *
 
 # check only running updates on episodes with high loss?
 # check input as difference between states
@@ -21,8 +20,8 @@ class PGPolicy:
     code gist
     https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
     '''
-    def __init__(self, obs_size, action_size, parameters):
-        self.q_network = PGNetwork(obs_size, parameters.hidden_size, action_size, parameters.seed)
+    def __init__(self, obs_size, action_size, PGNetwork, parameters):
+        self.pgnetwork = PGNetwork(obs_size, parameters.hidden_size, action_size, parameters.seed)
         self.rng = np.random.default_rng(parameters.seed)
         self.action_size = action_size
         self.lr = parameters.lr
@@ -30,6 +29,8 @@ class PGPolicy:
         self.batch_size = parameters.batch_size
         self.buffered_episodes = 0
         self.eps = np.finfo(np.float32).eps.item()
+        # for tracking action probs text on env fig
+        self.probtxt = None
 
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # # Device
@@ -40,20 +41,20 @@ class PGPolicy:
         #     self.device = torch.device("cpu")
         #     print("🐢 Using CPU")
 
-        self.optimizer = optim.Adam(self.q_network.parameters(), lr = self.lr)
+        self.optimizer = optim.Adam(self.pgnetwork.parameters(), lr = self.lr)
 
         # save info about taken action probability and received reward during episode
         self.saved_log_probs = []
         self.rewards = []
 
-    def step(self, action_prob, reward, done):
+    def step(self, action_log_prob, reward, done):
         '''
         Store experiences, learn every batch_size epizodes, when the episode buffer is ready
         '''
         # operate on diffs? what about inference from state?
         # state_diff = state-prev_state
         if not done:
-            self.saved_log_probs.append(action_prob)
+            self.saved_log_probs.append(action_log_prob)
             self.rewards.append(reward)
         else:
             log_probs = torch.stack(self.saved_log_probs)    
@@ -94,16 +95,32 @@ class PGPolicy:
         obs_norm_torch = torch.from_numpy(obs)
         obs_norm_torch.requires_grad = True
 
-        action_probs = self.q_network(obs_norm_torch)
+        self.action_probs = self.pgnetwork(obs_norm_torch)
         # Categorical and then .log_prob allow for backpropagation through computation graph, numpy obviously doesnt track that
         # action = self.rng.choice(np.arange(self.action_size), p = action_probs)
-        m = Categorical(action_probs)
+        m = Categorical(self.action_probs)
         action = m.sample()
         return action, m.log_prob(action) 
 
     def save(self, filename):
-        torch.save({'model_state_dict': self.q_network.state_dict()}, filename)
+        torch.save({'model_state_dict': self.pgnetwork.state_dict()}, filename)
 
     def load(self, filename):
         checkpoint = torch.load(filename)
-        self.q_network.load_state_dict(checkpoint['model_state_dict'])
+        self.pgnetwork.load_state_dict(checkpoint['model_state_dict'])
+
+    def render_probs(self, envfig):
+        adict = {
+            'UP' : 0,
+            'RIGHT' : 1,
+            'DOWN' : 2,
+            'LEFT' : 3,
+            }
+        txt = []
+        for k, v in adict.items():
+            txt.append(f'{k:5s} : {self.action_probs[v]:.2f}\n')
+        aprobtext = ''.join(txt)
+        if self.probtxt:
+            self.probtxt.remove()
+        self.probtxt = envfig.text(0.02, 0.5, aprobtext, fontsize = 12)
+
