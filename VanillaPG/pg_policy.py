@@ -32,17 +32,7 @@ class PGPolicy:
         # for tracking action probs text on env fig
         self.probtxt = None
 
-        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # # Device
-        # if parameters.use_gpu and torch.cuda.is_available():
-        #     self.device = torch.device("cuda:0")
-        #     print("🐇 Using GPU")
-        # else:
-        #     self.device = torch.device("cpu")
-        #     print("🐢 Using CPU")
-
         self.optimizer = optim.Adam(self.pgnetwork.parameters(), lr = self.lr)
-
         # save info about taken action probability and received reward during episode
         self.saved_log_probs = []
         self.rewards = []

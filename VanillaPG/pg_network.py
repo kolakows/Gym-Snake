@@ -17,21 +17,8 @@ class PGNetwork(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.h1(x))
-        x = F.log_softmax(self.out(x), dim = -1)
-        return x
-
-class PGNetwork_sm(nn.Module):
-    def __init__(self, obs_space_size, hidden_size, action_space_size, seed):       
-        super().__init__()
-        torch.manual_seed(seed)
-        self.h1 = nn.Linear(obs_space_size, hidden_size)
-        self.out = nn.Linear(hidden_size, action_space_size)
-
-    def forward(self, x):
-        x = F.relu(self.h1(x))
         x = F.softmax(self.out(x), dim = -1)
         return x
-
 
 class PGNetwork_deep(nn.Module):
     def __init__(self, obs_space_size, hidden_size, hidden_count, action_space_size, seed):       
