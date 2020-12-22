@@ -1,6 +1,6 @@
 
 from VanillaPG.pg_policy import PGPolicy
-from VanillaPG.pg_network import PGNetwork
+from VanillaPG.pg_network import PGNetwork, PGNetwork_deep
 
 class PolicySM(PGPolicy):
     def __init__(self, obs_size, action_size, parameters):
@@ -13,3 +13,8 @@ class PolicyRewards(PGPolicy):
     def step(self, action_log_prob, reward, done):
         penalty = -0.01
         super().step(action_log_prob, reward + penalty, done)
+
+class PolicyDeep(PGPolicy):
+    def __init__(self, obs_size, action_size, parameters):
+        super().__init__(obs_size, action_size, PGNetwork_deep, parameters)
+    

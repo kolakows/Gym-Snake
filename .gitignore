@@ -2,6 +2,10 @@ VanillaPG/snek-128h1-PG-first-take
 .vscode
 VanillaPG/128h1-sm
 VanillaPG/128h1-sm-negative-rewards
+VanillaPG/128h1-sm-negative-rewards-run2
+VanillaPG/128h2
+VanillaPG/128h4
+VanillaPG/128h1-sm-run2
 VanillaPG/__pycache__
 VanillaPG/checkpoints
 gym_snake.egg-info/PKG-INFO

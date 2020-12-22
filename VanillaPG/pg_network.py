@@ -21,7 +21,7 @@ class PGNetwork(nn.Module):
         return x
 
 class PGNetwork_deep(nn.Module):
-    def __init__(self, obs_space_size, hidden_size, hidden_count, action_space_size, seed):       
+    def __init__(self, obs_space_size, hidden_size, action_space_size, seed, hidden_count = 2):       
         super().__init__()
         torch.manual_seed(seed)
         self.layers = nn.ModuleList()

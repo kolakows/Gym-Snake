@@ -16,8 +16,9 @@ from utilities import *
 
 # choose policy to train
 
-#policyConstructor = PolicySM
-policyConstructor = PolicyRewards
+policyConstructor = PolicySM
+#policyConstructor = PolicyRewards
+#policyConstructor = PolicyDeep
 
 render = False
 render_every_eps = 1000

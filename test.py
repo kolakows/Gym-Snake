@@ -21,7 +21,6 @@ env.unit_size = 1
 env.unit_gap = 0
 obs = env.reset() # Constructs an instance of the game
 
-
 map_width = 10
 map_height = 10
 net_params = {
@@ -32,16 +31,16 @@ net_params = {
     'batch_size' : 10
 }
 # prepare network
-PGNetwork = PGNetwork_sm
+PGNetwork = PGNetwork
 obs_size = map_width * map_height * data_channels
 policy = PGPolicy(obs_size, action_space, PGNetwork, Namespace(**net_params))
-policy.load('./VanillaPG/checkpoints/checkpoint5000.pkl')
+policy.load('./VanillaPG/128h1-sm-run2/checkpoint5000steps1092794.pkl')
 
-for i in range(1000):
+for i in range(10000):
     obs_norm = normalize_and_flatten(obs)
     action, _ = policy.act(obs_norm)
     if i > 0: policy.render_probs(env.fig)
-    env.render(frame_speed=1.)
+    env.render(frame_speed=0.1)
     obs, reward, done, info = env.step([action]) 
     if done:
         env.reset()
