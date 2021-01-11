@@ -8,5 +8,7 @@ VanillaPG/128h4
 VanillaPG/128h1-sm-run2
 VanillaPG/__pycache__
 VanillaPG/checkpoints
+VanillaPG/128h-sm-cut40
+VanillaPG/128h-sm-cut30
 gym_snake.egg-info/PKG-INFO
 gym_snake.egg-info/SOURCES.txt
