@@ -92,12 +92,19 @@ class PGPolicy:
         action = m.sample()
         return action, m.log_prob(action) 
 
-    def save(self, filename):
-        torch.save({'model_state_dict': self.pgnetwork.state_dict()}, filename)
+    def save(self, filename, steps, time):
+        torch.save({'steps': steps,
+                    'time' : time,
+                    'model_state_dict': self.pgnetwork.state_dict(),
+                    'optimizer_state_dict' : self.optimizer.state_dict()},
+                    filename)
+        
 
     def load(self, filename):
         checkpoint = torch.load(filename)
         self.pgnetwork.load_state_dict(checkpoint['model_state_dict'])
+        if 'optimizer_state_dict' in checkpoint:
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
     def render_probs(self, envfig):
         adict = {
