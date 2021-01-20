@@ -22,9 +22,10 @@ For env details check original repo's [README](https://github.com/grantsrb/Gym-S
 ## Observation space
 
 Comparing to the orginal environment, before passing observations to network, they are mapped to three channels:
-1. Snake's head is 1 
-2. Snake's body is marked with ones
-3. Apple is 1
+1. snake's head is 1,
+2. snake's body is marked with ones,
+3. apple is 1.
+
 All the other values are zeroes. Probably standarization of the input would facilitate learning. Then the observations are flattened and passed to the network.
 
 ## Policy gradients
