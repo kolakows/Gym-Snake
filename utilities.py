@@ -21,12 +21,20 @@ colors = {
         tuple([0, 255, 0]) : np.array([0, 0, 0]), # SPACE_COLOR to space
     }
 
-# make obs zero-centered, with std = 1
-def normalize_and_flatten(obs):
+def normalize(obs):
     obs = obs.astype(np.float32)
     nobs = np.zeros_like(obs)
     for x in range(obs.shape[0]):
         for y in range(obs.shape[1]):
             nobs[x,y] = colors[tuple(obs[x,y])]
-    return nobs.flatten()
+    return nobs
+
+def standarize(obs):
+    obs = (obs - obs.mean()) / obs.var()
+    return obs
+
+# make obs zero-centered, with std = 1
+def normalize_and_flatten(obs):
+    return normalize(obs).flatten()
+
 

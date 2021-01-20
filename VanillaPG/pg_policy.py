@@ -9,7 +9,11 @@ import numpy as np
 import gym
 import gym_snake
 
+from collections import defaultdict
 
+from pg_network import *
+
+import inspect
 # check only running updates on episodes with high loss?
 # check input as difference between states
 
@@ -21,7 +25,10 @@ class PGPolicy:
     https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
     '''
     def __init__(self, obs_size, action_size, PGNetwork, parameters):
-        self.pgnetwork = PGNetwork(obs_size, parameters.hidden_size, action_size, parameters.seed)
+        if inspect.isclass(PGNetwork):
+            self.pgnetwork = PGNetwork(obs_size, parameters.hidden_size, action_size, parameters.seed)
+        else:
+            self.pgnetwork = PGNetwork
         self.rng = np.random.default_rng(parameters.seed)
         self.action_size = action_size
         self.lr = parameters.lr
@@ -72,10 +79,39 @@ class PGPolicy:
         if self.buffered_episodes == self.batch_size:
             print(f'Updated weights ')
             self.optimizer.step()
+            self._calc_grad_change()
             self.optimizer.zero_grad()
             self.buffered_episodes = 0
            
-            
+    
+    def _calc_grad_change(self):
+        '''
+        ugly code
+        '''
+        # check what was wrong
+        # if not isinstance(self.pgnetwork, PGSimpleConvNet):
+        #     return
+        if not hasattr(self, '_my_eps'):
+            self._my_eps = 1
+            self.highest_grad = {}
+            self.highest_grad['c1'] = torch.clone(self.pgnetwork.conv1.weight.grad)
+            self.highest_grad['c2'] = torch.clone(self.pgnetwork.conv2.weight.grad)
+            self.highest_grad['c3'] = torch.clone(self.pgnetwork.conv3.weight.grad)
+            self.highest_grad['c4'] = torch.clone(self.pgnetwork.conv4.weight.grad)
+        else:
+            self._my_eps += 1
+        
+        self.highest_grad['c1'] += self.pgnetwork.conv1.weight.grad
+        self.highest_grad['c2'] += self.pgnetwork.conv2.weight.grad
+        self.highest_grad['c3'] += self.pgnetwork.conv3.weight.grad
+        self.highest_grad['c4'] += self.pgnetwork.conv4.weight.grad
+
+    def _print_grads(self):
+        print(f'c1 {self.highest_grad["c1"]/self._my_eps}')
+        print(f'c2 {self.highest_grad["c2"]/self._my_eps}')
+        print(f'c3 {self.highest_grad["c3"]/self._my_eps}')
+        print(f'c4 {self.highest_grad["c4"]/self._my_eps}')
+
     def act(self, obs):
         '''
         Performs inference on internal neural network, which returns action probabilities, then draws action
@@ -105,6 +141,7 @@ class PGPolicy:
         self.pgnetwork.load_state_dict(checkpoint['model_state_dict'])
         if 'optimizer_state_dict' in checkpoint:
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            print(f'Trained for {checkpoint["time"]/3600} hours')
 
     def render_probs(self, envfig):
         adict = {
