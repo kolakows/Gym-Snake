@@ -10,5 +10,8 @@ VanillaPG/__pycache__
 VanillaPG/checkpoints
 VanillaPG/128h-sm-cut40
 VanillaPG/128h-sm-cut30
+VanillaPG/conv-nolearn
+VanillaPG/128h2-sm-cut40
+VanillaPG/128h1-sm-cut40-long
 gym_snake.egg-info/PKG-INFO
 gym_snake.egg-info/SOURCES.txt
